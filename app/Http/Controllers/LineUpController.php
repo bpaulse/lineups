@@ -15,9 +15,16 @@ class LineUpController extends Controller
 	 */
 	public function lineup($station, $inputDate)
 	{
-		// Given the Radio Station and Date, 
-		// var_dump($station);
-		// var_dump($date);
+
+		// Given the Radio Station and Date
+
+		$stations = DB::select("select * from `station` where `station_name` like '%".$station."%'");
+
+		if ( !isset($stations[0]) ) {
+			return "Station desc given does not exist";
+		}
+
+		$station_id = $stations[0]->station_id;
 
 		if ( !$this->checkmydate($inputDate) ) {
 
@@ -49,14 +56,17 @@ class LineUpController extends Controller
 		if ( $this->checkmydate($calcData) ) {
 
 			$sql = "
-			SELECT `show`.`show_id`, `station`.`station_name`,`lineup`.`lineup_desc`,`show`.`show_name`, `timeslot`.`timeslot_date`, `timeslot`.`start_time`, `timeslot`.`end_time`, `users`.`firstname`, `users`.`lastname` FROM `show`
-			JOIN `timeslot` ON `timeslot`.`timeslot_id` = `show`.`timeslot_id`
-			JOIN `lineup` ON `lineup`.`lineup_id` = `timeslot`.`lineup_id`
-			JOIN `station` ON `station`.`station_id` = `lineup`.`station_id`
-			JOIN `show_presenter` on `show_presenter`.`show_id` = `show`.`show_id`
-			JOIN `presenter` on `show_presenter`.`presenter_id` = `presenter`.`presenter_id`
-			JOIN `users` on `users`.`user_id` = `presenter`.`user_id`
-			WHERE `station`.`station_name` LIKE '%".$station."%' AND `timeslot`.`timeslot_date` = '".$calcData."'";
+				SELECT `station`.`station_name`, `lineup`.`lineup_desc`, `show`.`show_name`, `timeslot`.`timeslot_date`, `users`.`firstname`, `users`.`lastname` FROM `station`
+				INNER join `lineup` on `lineup`.`station_id` = `station`.`station_id` 
+				INNER JOIN `timeslot` on `timeslot`.`lineup_id` = `lineup`.`lineup_id`
+				INNER JOIN `timespanslot` on `timespanslot`.`timespanslot_id` = `timeslot`.`timespanslot_id`
+				INNER JOIN `show` on `show`.`timeslot_id` = `timeslot`.`timeslot_id`
+				INNER JOIN `show_presenter` ON `show_presenter`.`show_id` = `show`.`show_id`
+				INNER JOIN `presenter` ON `presenter`.`presenter_id` = `show_presenter`.`presenter_id`
+				INNER JOIN `users` ON `users`.`user_id` = `presenter`.`user_id`
+				WHERE `station`.`station_id`= ".$station_id." AND `timeslot`.`timeslot_date` = '$calcData'
+				ORDER BY `timespanslot`.`start_time` ASC
+			";
 
 			var_dump($sql);exit();
 
@@ -66,7 +76,7 @@ class LineUpController extends Controller
 			$lineups = NULL;
 		}
 
-		// var_dump($lineups);
+		var_dump($lineups);
 
 		return $lineups;
 	}
