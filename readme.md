@@ -29,3 +29,5 @@ name_surnane_str - name or surname of a DJ. Name can be shorted ie first 3/4 let
 ( Get all the slots for a DJ for specified (predefined) period )
 
 3. I can safely say that this is not 2/3 hours work.
+
+Bevan
