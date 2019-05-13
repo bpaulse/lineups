@@ -19,7 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 	return $request->user();
 });
 
-Route::get('/lineups/{station}/{today}', 'LineUpController@lineup');
-// Route::get('/lineups/{station}/', 'LineUpController@index');
+Route::get('/lineups/{station}/{lineupdate}', 'LineUpController@lineup');
+Route::get('/djslots/{period}/{name_surnane_str}', 'LineUpController@getDJSlots');
 // Route::get('/lineups/{station}/', 'LineUpController@index');
 // Route::get('/lineups/{station}/', 'LineUpController@index');
